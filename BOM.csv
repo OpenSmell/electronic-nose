@@ -1,0 +1,11 @@
+item,qty,purpose,example_price_ngn,notes
+ESP32 38-pin Dev Board,1,Microcontroller,8000–9850,Test before buying
+MQ-135 Air Quality Sensor,1,NH3/NOx/benzene/smoke,3000–4500,
+MQ-3 Alcohol Gas Sensor,1,Alcohol vapour,2500–4000,
+MQ-7 Carbon Monoxide Sensor,1,CO detection,3500–3950,
+MQ-6 LPG Gas Sensor,1,LPG/propane/butane,3500–4500,
+DHT22 Temperature/Humidity Sensor,1,Temperature + humidity,2000–2500,3.3V logic
+Mini Breadboard 170 tie-points,1,Wiring base,1500–2200,
+Jumper Wires M-M 40pc,1,Connections,1000–1800,
+10kΩ Resistors 5-pack,1,Voltage dividers,300–500,One per MQ sensor + spare
+Micro USB Data Sync Cable,1,Power + programming,300–500,Must be data‑sync not charge‑only
