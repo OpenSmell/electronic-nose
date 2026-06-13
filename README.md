@@ -1,16 +1,17 @@
 # OpenSmell Electronic Nose — Reference Hardware
 
-Build an interoperable electronic nose from locally available parts, for $20–$50.
+Build an interoperable electronic nose from locally available parts.
 
 ## Quick Start
 
-1. **Buy parts** — See [BOM.csv](BOM.csv) for a full shopping list with Lagos, Nigeria prices.
+1. **Buy parts** — See [BOM.csv](BOM.csv) for a full shopping list.
 2. **Wire it** — Follow [WIRING.md](WIRING.md) for pin connections. For a step-by-step build guide with photos, see [BUILD.md](BUILD.md).
 3. **Flash firmware** — Install [PlatformIO](https://platformio.org/), open `firmware/`, upload:
    ```bash
    cd firmware
    platformio run -t upload
    ```
+   Or use Osmograph for simplicity, details in [BUILD.md](BUILD.md).
 4. **Record** — Run `python src/visualizer.py` (or `screen /dev/ttyUSB0 115200`), expose sensor to a substance, save CSV.
 5. **Test** — Run the interoperability test:
    ```bash
@@ -24,14 +25,14 @@ The same firmware pattern works for **any number of MQ sensors** (1–6) and eve
 | Tier | Sensors | Use case |
 |------|---------|----------|
 | Bare Minimum | 1 (MQ-135) | General VOC detection |
-| Standard | 2 (MQ-135, MQ-3) | Food vs alcohol |
-| Your Config | **3 (MQ-135, MQ-3, MQ-7)** | Food identification (this build) |
+| Better | 2 (MQ-135, MQ-3) | Food vs alcohol |
+| Standard | **3 (MQ-135, MQ-3, MQ-7)** | Food identification (this build) |
 | Advanced | 4 (MQ-135, MQ-3, MQ-6, MQ-7) + DHT22 | Food spoilage, substance ID |
 | Professional | 6 (add MQ-4, MQ-8) + BME680 | Lab-grade fingerprinting |
 
 ### Adding more sensors — the pattern
 
-The firmware is minimal by design. Each sensor is three lines:
+The Osmograph GUI handles this as well, but the firmware is minimal by design. Each sensor is three lines:
 
 ```cpp
 #define SENSOR1_PIN 34   // 1. Define pin
@@ -82,9 +83,6 @@ For 6 sensors, no mapping needed — each channel maps to itself.
 
 Full care guide at [CARE.md](CARE.md).
 
-## Experiment Protocol
-
-[EXPERIMENT.md](EXPERIMENT.md) — step-by-step protocol for recording substances and evaluating against SmellNet prototypes.
 
 ## Project Structure
 
