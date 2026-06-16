@@ -4,3 +4,4 @@ __pycache__/
 .pio/
 .vscode/
 models/
+test-data/
