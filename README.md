@@ -12,10 +12,10 @@ Build an interoperable electronic nose from locally available parts.
    platformio run -t upload
    ```
    Or use Osmograph for simplicity, details in [BUILD.md](BUILD.md).
-4. **Record** — Run `python src/visualizer.py` (or `screen /dev/ttyUSB0 115200`), expose sensor to a substance, save CSV.
-5. **Test** — Run the interoperability test:
+4. **Record** — Launch [Osmograph](../Osmograph/) (`python -m Osmograph`), connect to your board, and press Record. Or use `screen /dev/ttyUSB0 115200` to log raw CSV data.
+5. **Test** — Run the interoperability test from the research calibration-experiments:
    ```bash
-   python src/interop_test.py my_recording.csv
+   python ../research/calibration-experiments/interop_test.py my_recording.csv
    ```
 
 ## Sensor Tiers — Scale Up or Down
@@ -94,9 +94,8 @@ electronic-nose/
   CARE.md        — Sensor burn-in and maintenance
   ENCLOSURE.md   — Enclosure design notes
   EXPERIMENT.md  — Interoperability protocol
-  src/
-    visualizer.py     — Real-time sensor dashboard
-    interop_test.py   — CLI interoperability test
+  archive/
+    visualizer.py     — Archived real-time sensor dashboard (superseded by Osmograph)
   firmware/      — PlatformIO firmware (N-sensor pattern)
 ```
 

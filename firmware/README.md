@@ -1,32 +1,38 @@
-# OpenSmell Firmware
+# Firmware — ESP32 E‑Nose
 
 PlatformIO project for the ESP32-based electronic nose.
 
-## Prerequisites
+## Hardware Targets
 
-- [PlatformIO](https://platformio.org/) (VS Code extension or CLI)
-- USB cable (data-sync, not charge-only)
+- ESP32 Dev Kit V1 (ESP-WROOM-32)
+- MQ series sensors: MQ-135, MQ-3, MQ-7 (3-sensor config)
+- Optional: MQ-6, MQ-4, MQ-8 (6-sensor config)
 
-## Flash
+## Build & Flash
 
 ```bash
+# Install PlatformIO CLI
+pip install platformio
+
+# Build and upload
 cd firmware
-platformio run -t upload
+pio run -t upload
+
+# Monitor serial output
+pio device monitor
 ```
 
-## Monitor
+## Sensor Configurations
 
-```bash
-platformio device monitor -b 115200
+Edit `src/main.cpp` and set `ACTIVE_SENSORS` to match your hardware:
+
+- `3` — MQ-135, MQ-3, MQ-7 (standard)
+- `4` — MQ-135, MQ-3, MQ-6, MQ-7
+- `6` — all six MQ sensors
+
+## Data Format
+
+Outputs CSV over serial at 115200 baud:
 ```
-
-## Add a sensor
-
-1. Add pin definition: `#define MQ6_PIN 33`
-2. Add `analogRead()` in `loop()`
-3. Append to `Serial.print()` chain
-4. Update the channel mapping in the SDK (see main repo README)
-
-## Customize
-
-Edit `platformio.ini` to change board, upload speed, or monitor baud rate.
+timestamp_ms, MQ135, MQ3, MQ6, MQ7, MQ4, MQ8
+```
