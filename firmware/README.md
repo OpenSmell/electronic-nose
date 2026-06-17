@@ -1,8 +1,8 @@
-# Firmware — ESP32 E‑Nose
+# Firmware — ESP32 E‑Nose (Archived)
 
-PlatformIO project for the ESP32-based electronic nose.
+Original serial-only firmware for the ESP32-based electronic nose. Retained for reference.
 
-**Note:** This firmware source is the original serial-only version. The current universal firmware (USB Serial + WiFi AP) is maintained in the [Osmograph](https://github.com/opensmell/osmograph) app under `board/compiler.py`. Use Osmograph for one-click firmware flashing — it handles both compilation and upload via esptool.
+**The current firmware lives in the Osmograph app** (`board/compiler.py`) and supports USB Serial + WiFi AP simultaneously with one-click flashing via esptool. See the [Osmograph README](../../Osmograph/README.md) for how to flash your board.
 
 ## Hardware Targets
 
@@ -21,7 +21,7 @@ pio device monitor
 
 ## Data Format
 
-The universal Osmograph firmware outputs lines in this format over both Serial (115200 baud) and WiFi TCP (port 8080):
+The Osmograph firmware outputs lines in this format over both Serial (115200 baud) and WiFi TCP (port 8080):
 
 ```
 OSM,<adc0>,<adc1>,...

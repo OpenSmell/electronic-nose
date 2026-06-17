@@ -86,7 +86,7 @@ electronic-nose/
 
 - [OpenSmell SDK](https://github.com/opensmell/opensmell) — `pip install opensmell`
 - [Osmograph GUI](https://github.com/opensmell/osmograph) — Desktop app for recording and training
-- [Universal Encoder](https://github.com/opensmell/universal-encoder) — Training code
+- [Encoder](https://github.com/opensmell/encoder) — Training code
 - [Chemoprint Optimization](https://github.com/opensmell/chemoprint-optimization) — RDKit descriptor selection
 - [Data Commons](https://github.com/opensmell/data-commons) — Contribute your recordings
 - [Session-Invariance Proof](https://github.com/opensmell/session-invariance)
