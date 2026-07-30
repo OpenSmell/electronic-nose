@@ -1,55 +1,81 @@
+/*
+ * OpenSmell E-Nose Universal Firmware
+ * Supports USB Serial AND WiFi AP + TCP on port 8080.
+ * Falls back to Serial-only if WiFi fails.
+ * ADC1 pins only (WiFi-safe): 32, 33, 34, 35, 36, 39
+ */
+
 #include <Arduino.h>
+#include <WiFi.h>
+#include <ESPmDNS.h>
 
-// ============================================================
-// OpenSmell E-Nose Firmware
-// ============================================================
-// SCALING: To add more MQ sensors, just add pins and analogRead.
-//   Example for 4 sensors:
-//     #define MQ6_PIN   33
-//     int mq6 = analogRead(MQ6_PIN);
-//     Serial.print(","); Serial.print(mq6);  // add to CSV
-// ============================================================
+static const int mq_pins[] = {32, 33, 34, 35, 36, 39};
+static const int PIN_COUNT = 6;
 
-// Sensor pins
-#define MQ135_PIN 34
-#define MQ3_PIN   35
-#define MQ7_PIN   32
+static WiFiServer tcp_server(8080);
+static WiFiClient tcp_client;
+static bool wifi_ok = false;
 
 void setup() {
   Serial.begin(115200);
-  delay(1000);
-  
-  // Set ADC attenuation for wider voltage range
-  analogSetPinAttenuation(MQ135_PIN, ADC_11db);
-  analogSetPinAttenuation(MQ3_PIN, ADC_11db);
-  analogSetPinAttenuation(MQ7_PIN, ADC_11db);
-  
-  // Print CSV header once (skip if using 3-sensor raw format)
-  // Serial.println("MQ135,MQ3,MQ7");
+  delay(200);
+  Serial.println("OSM:boot");
+
+  for (int i = 0; i < PIN_COUNT; i++) {
+    pinMode(mq_pins[i], INPUT);
+    analogSetPinAttenuation(mq_pins[i], ADC_11db);
+  }
+
+  // WiFi AP - non-blocking, errors don't halt setup
+  uint32_t id = (uint32_t)ESP.getEfuseMac() & 0xFFFFFF;
+  char ssid[32];
+  snprintf(ssid, sizeof(ssid), "Osmograph-%06X", id);
+
+  WiFi.mode(WIFI_AP);
+  wifi_ok = WiFi.softAP(ssid, "osmograph");
+  if (wifi_ok) {
+    Serial.printf("OSM:wifi %s %s\n", ssid, WiFi.softAPIP().toString().c_str());
+
+    if (MDNS.begin("osmograph")) {
+      MDNS.addService("_osmograph", "_tcp", 8080);
+    }
+
+    tcp_server.begin();
+    tcp_server.setNoDelay(true);
+    Serial.println("OSM:tcp 8080");
+  } else {
+    Serial.println("OSM:wifi fail");
+  }
+
+  Serial.println("OSM:ready");
 }
 
 void loop() {
   static unsigned long last = 0;
   unsigned long now = millis();
-  
-  // Wait for serial to be ready (skip bootloader noise)
-  if (!Serial) {
-    delay(100);
-    return;
+
+  // TCP accept
+  if (wifi_ok) {
+    if (!tcp_client || !tcp_client.connected()) {
+      if (tcp_client) tcp_client.stop();
+      tcp_client = tcp_server.available();
+    }
   }
-  
-  int mq135 = analogRead(MQ135_PIN);
-  int mq3   = analogRead(MQ3_PIN);
-  int mq7   = analogRead(MQ7_PIN);
-  
-  // Only print if ADC values are valid (non-zero, within range)
-  if (mq135 >= 0 && mq3 >= 0 && mq7 >= 0) {
-    Serial.print(mq135);
-    Serial.print(",");
-    Serial.print(mq3);
-    Serial.print(",");
-    Serial.println(mq7);
+
+  if (now - last < 100) return;  // 10 Hz
+  last = now;
+
+  char buf[96];
+  int pos = 0;
+  for (int i = 0; i < PIN_COUNT; i++) {
+    pos += snprintf(buf + pos, sizeof(buf) - pos, "%s%d", i > 0 ? "," : "", analogRead(mq_pins[i]));
   }
-  
-  delay(500);
+  buf[pos++] = '\n';
+  buf[pos] = '\0';
+
+  Serial.print(buf);
+
+  if (wifi_ok && tcp_client && tcp_client.connected()) {
+    tcp_client.write((uint8_t*)buf, pos);
+  }
 }
