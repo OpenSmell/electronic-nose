@@ -1,6 +1,6 @@
 # OpenSmell Electronic Nose — Reference Hardware
 
-Build an interoperable electronic nose from locally available parts.
+Build an electronic nose from locally available parts.
 
 ## Quick Start
 
