@@ -10,7 +10,11 @@
 #include <ESPmDNS.h>
 
 static const int mq_pins[] = {32, 33, 34, 35, 36, 39};
-static const int PIN_COUNT = 6;
+#ifndef OSMOGRAPH_PIN_COUNT
+#define OSMOGRAPH_PIN_COUNT 6
+#endif
+static const int PIN_COUNT = OSMOGRAPH_PIN_COUNT;
+static_assert(PIN_COUNT >= 1 && PIN_COUNT <= 6, "OSMOGRAPH_PIN_COUNT must be 1..6");
 
 static WiFiServer tcp_server(8080);
 static WiFiClient tcp_client;
@@ -48,6 +52,7 @@ void setup() {
   }
 
   Serial.println("OSM:ready");
+  Serial.printf("INFO,universal-esp32,1.0.0,%d\n", PIN_COUNT);
 }
 
 void loop() {
