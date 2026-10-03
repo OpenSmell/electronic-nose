@@ -10,9 +10,18 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 
+// Nominal sample period in milliseconds. 500 ms (2 Hz) is the default because
+// that is the cadence measured on all 13 reference recordings; see
+// SAMPLING_CONTRACT.md. Override at build time with
+// -DOSMOGRAPH_SAMPLE_INTERVAL_MS=100 for a 10 Hz build.
+#ifndef OSMOGRAPH_SAMPLE_INTERVAL_MS
+#define OSMOGRAPH_SAMPLE_INTERVAL_MS 500
+#endif
+static_assert(OSMOGRAPH_SAMPLE_INTERVAL_MS >= 10,
+              "sample interval below 10 ms exceeds what sequential ADC reads can sustain");
+
 static const int mq_pins[] = {32, 33, 34, 35, 36, 39};
 static const int PIN_COUNT = 6;
-static const int SAMPLE_RATE_MS = 100;  // 10 Hz
 
 #define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
@@ -36,6 +45,10 @@ void setup() {
     analogSetPinAttenuation(mq_pins[i], ADC_11db);
   }
 
+  // Declare the cadence on the wire so the host never has to assume it.
+  Serial.printf("INFO,universal-esp32-ble,1.0.0,%d,interval_ms=%d\n",
+                PIN_COUNT, OSMOGRAPH_SAMPLE_INTERVAL_MS);
+
   BLEDevice::init("Osmograph-BLE");
   server = BLEDevice::createServer();
   server->setCallbacks(new ServerCallbacks());
@@ -58,7 +71,7 @@ void setup() {
 void loop() {
   static unsigned long last = 0;
   unsigned long now = millis();
-  if (now - last < SAMPLE_RATE_MS) return;
+  if (now - last < OSMOGRAPH_SAMPLE_INTERVAL_MS) return;
   last = now;
 
   char buf[96];

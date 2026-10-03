@@ -28,3 +28,8 @@ OSM,<adc0>,<adc1>,...
 ```
 
 The `OSM` prefix allows the Osmograph app to distinguish sensor data from bootloader output. Readings arrive every 500ms.
+
+## Sampling contract
+
+All downstream math assumes this 500ms (2 Hz) cadence — never row index as
+seconds. See [`../SAMPLING_CONTRACT.md`](../SAMPLING_CONTRACT.md).

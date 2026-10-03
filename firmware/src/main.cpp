@@ -9,6 +9,16 @@
 #include <WiFi.h>
 #include <ESPmDNS.h>
 
+// Nominal sample period in milliseconds. 500 ms (2 Hz) is the default because
+// that is the cadence measured on all 13 reference recordings; see
+// SAMPLING_CONTRACT.md. Override at build time with
+// -DOSMOGRAPH_SAMPLE_INTERVAL_MS=100 for a 10 Hz build.
+#ifndef OSMOGRAPH_SAMPLE_INTERVAL_MS
+#define OSMOGRAPH_SAMPLE_INTERVAL_MS 500
+#endif
+static_assert(OSMOGRAPH_SAMPLE_INTERVAL_MS >= 10,
+              "sample interval below 10 ms exceeds what sequential ADC reads can sustain");
+
 static const int mq_pins[] = {32, 33, 34, 35, 36, 39};
 #ifndef OSMOGRAPH_PIN_COUNT
 #define OSMOGRAPH_PIN_COUNT 6
@@ -52,7 +62,11 @@ void setup() {
   }
 
   Serial.println("OSM:ready");
-  Serial.printf("INFO,universal-esp32,1.0.0,%d\n", PIN_COUNT);
+  // Declare the cadence on the wire. A host that has to assume a sample rate
+  // will eventually assume the wrong one, and every count-based temporal
+  // feature (rise time, decay time, latency) then scales by that error.
+  Serial.printf("INFO,universal-esp32,1.0.0,%d,interval_ms=%d\n",
+                PIN_COUNT, OSMOGRAPH_SAMPLE_INTERVAL_MS);
 }
 
 void loop() {
@@ -67,7 +81,7 @@ void loop() {
     }
   }
 
-  if (now - last < 100) return;  // 10 Hz
+  if (now - last < OSMOGRAPH_SAMPLE_INTERVAL_MS) return;
   last = now;
 
   char buf[96];
