@@ -75,9 +75,12 @@ void loop() {
   last = now;
 
   char buf[96];
-  int pos = 0;
+  // The OSM prefix is part of the wire format, not decoration: a reader that
+  // dispatches on message type cannot tell a sample from a control line without
+  // it, and a spec-conforming reader drops unprefixed CSV entirely.
+  int pos = snprintf(buf, sizeof(buf), "OSM");
   for (int i = 0; i < PIN_COUNT; i++) {
-    pos += snprintf(buf + pos, sizeof(buf) - pos, "%s%d", i > 0 ? "," : "", analogRead(mq_pins[i]));
+    pos += snprintf(buf + pos, sizeof(buf) - pos, ",%d", analogRead(mq_pins[i]));
   }
   buf[pos++] = '\n';
   buf[pos] = '\0';
